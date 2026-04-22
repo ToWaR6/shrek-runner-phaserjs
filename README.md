@@ -2,7 +2,9 @@
 
 > Runner / platformer 2D — Aidez Shrek à fuir Lord Farquaad !
 
-![screenshot](screenshot.png)
+| Menu principal | Gameplay |
+|:---:|:---:|
+| ![Menu](screenshot_menu.png) | ![Gameplay](screenshot.png) |
 
 ## Synopsis
 
