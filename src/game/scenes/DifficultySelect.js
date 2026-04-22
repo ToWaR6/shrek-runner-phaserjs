@@ -106,11 +106,12 @@ export class DifficultySelect extends Scene
                 localStorage.setItem('selectedDifficulty', selectedDifficulty);
                 
                 if (this.targetLevel === 2) {
-                    this.scene.start('Level2');
+                    const level1Score = parseInt(localStorage.getItem('level1Score')) || 0;
+                    this.scene.start('Level2', { level1Score });
                 } else {
                     this.scene.start('Game');
                 }
-            } else if (event.code === 'Escape') {
+            }else if (event.code === 'Escape') {
                 if (this.targetLevel === 2) {
                     this.scene.start('LevelSelect');
                 } else {

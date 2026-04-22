@@ -98,24 +98,30 @@ export class ScoreSummary extends Scene
         this.add.text(cx - 200, 390, '⭐ Note', { fontFamily: 'Uncial Antiqua', fontSize: 20, color: '#cccccc' }).setOrigin(0, 0.5);
         this.add.text(cx + 200, 390, grade, { fontFamily: 'Uncial Antiqua', fontSize: 52, color: gradeColor, stroke: '#000000', strokeThickness: 6 }).setOrigin(1, 0.5);
 
-        // ── Score Summary (for Level 2) ──
-        if (this.level === 2 && this.won) {
-            this.add.rectangle(cx, 470, 560, 100, 0x000000, 0.65).setOrigin(0.5);
+        // ── Score Summary (for both levels) ──
+        if (this.won) {
+            if (this.level === 1) {
+                // Level 1 victory - save score to localStorage
+                localStorage.setItem('level1Score', this.onionCount.toString());
+                localStorage.setItem('level1Complete', 'true');
+            } else if (this.level === 2) {
+                // Level 2 victory - show cumulative and save all scores
+                this.add.rectangle(cx, 470, 560, 100, 0x000000, 0.65).setOrigin(0.5);
 
-            this.add.text(cx - 200, 440, '📊 SCORES CUMULATIFS', { fontFamily: 'Uncial Antiqua', fontSize: 16, color: '#d4a840' }).setOrigin(0, 0.5);
+                this.add.text(cx - 200, 440, '📊 SCORES CUMULATIFS', { fontFamily: 'Uncial Antiqua', fontSize: 16, color: '#d4a840' }).setOrigin(0, 0.5);
 
-            const level1Display = this.level1Score || 0;
-            const level2Display = this.onionCount;
-            const totalDisplay = level1Display + level2Display;
+                const level1Display = this.level1Score || 0;
+                const level2Display = this.onionCount;
+                const totalDisplay = level1Display + level2Display;
 
-            this.add.text(cx - 200, 460, `Niveau 1 (Marais): ${level1Display}`, { fontFamily: 'Fondamento', fontSize: 14, color: '#6ecf3a' }).setOrigin(0, 0.5);
-            this.add.text(cx - 200, 480, `+ Niveau 2 (Château): ${level2Display}`, { fontFamily: 'Fondamento', fontSize: 14, color: '#d4a840' }).setOrigin(0, 0.5);
-            this.add.text(cx - 200, 502, `= Total: ${totalDisplay}`, { fontFamily: 'Uncial Antiqua', fontSize: 18, color: '#ffff00', stroke: '#000000', strokeThickness: 3 }).setOrigin(0, 0.5);
+                this.add.text(cx - 200, 460, `Niveau 1 (Marais): ${level1Display}`, { fontFamily: 'Fondamento', fontSize: 14, color: '#6ecf3a' }).setOrigin(0, 0.5);
+                this.add.text(cx - 200, 480, `+ Niveau 2 (Château): ${level2Display}`, { fontFamily: 'Fondamento', fontSize: 14, color: '#d4a840' }).setOrigin(0, 0.5);
+                this.add.text(cx - 200, 502, `= Total: ${totalDisplay}`, { fontFamily: 'Uncial Antiqua', fontSize: 18, color: '#ffff00', stroke: '#000000', strokeThickness: 3 }).setOrigin(0, 0.5);
 
-            // Persist scores
-            localStorage.setItem('level2Score', level2Display.toString());
-            localStorage.setItem('totalScore', totalDisplay.toString());
-            localStorage.setItem('level1Complete', 'true');
+                // Persist scores
+                localStorage.setItem('level2Score', level2Display.toString());
+                localStorage.setItem('totalScore', totalDisplay.toString());
+            }
         }
 
         // ── Separator ──
