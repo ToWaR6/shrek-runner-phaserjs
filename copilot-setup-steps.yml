@@ -1,0 +1,345 @@
+name: "Shrek Run - Agent Configuration"
+description: "Agent specialization config for Phaser 4 + React game development"
+
+preinstall_steps:
+  - name: "Install dependencies"
+    command: "npm install"
+    description: "Install Node dependencies (Phaser, React, Vite, ESLint)"
+
+agents:
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 🎮 GAME MECHANICS AGENT
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  game-mechanics:
+    name: "Game Mechanics"
+    description: "Develop and balance core gameplay (physics, difficulty, features)"
+    context: |
+      You are developing the core gameplay mechanics for a Phaser 4 platformer/runner.
+      
+      Key constraints:
+      - The player must collect 7+ oignons out of 21 to complete the level
+      - Boss speed and player speed must be tunable parameters
+      - Physics must be arcade physics (Phaser 4 default)
+      - Difficulty must scale dynamically with time (game gets harder)
+      - All obstacles must interact with collision layers
+      
+      Core gameplay loop:
+      - Player spawns, must traverse 6400px to cabin
+      - Obstacles: mud (slow), villagers (instant death), boss (progressive catch)
+      - Collectibles: oignons (essential), power-ups (future)
+      
+      You work primarily in src/game/scenes/Game.js. Coordinate with:
+      - Level Design Agent: obstacle spawn patterns
+      - Visual Agent: sprite interactions
+      - Audio Agent: feedback sounds
+    files_to_read:
+      - "src/game/scenes/Game.js"
+      - "src/game/EventBus.js"
+      - "src/game/main.js"
+    tools_access: ["view", "edit", "grep", "powershell"]
+    lint_command: "npm run lint"
+    dev_command: "npm run dev"
+    success_criteria:
+      - "ESLint passes"
+      - "Maintains 60+ fps"
+      - "7 oignons minimum is achievable without power-ups"
+      - "No memory leaks in dev tools"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 🎨 VISUAL / SPRITE AGENT
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  visual-effects:
+    name: "Visual Effects & Sprites"
+    description: "Generate sprites procedurally and implement animations/particles"
+    context: |
+      You are responsible for all visual presentation of the game.
+      
+      Key constraints:
+      - ZERO external image files - all sprites generated with Canvas/Graphics API
+      - Use Phaser 4 Graphics, Shapes, or Text rendering
+      - Color palette: greens/browns (swamp), blues/oranges (characters)
+      - Particles must not exceed 50 active at once (performance)
+      - All tweens must use duration, ease, and callbacks
+      
+      Sprite categories:
+      1. Characters: Shrek (playable), Farquaad (boss), Villagers (enemies)
+      2. Environment: trees, shrubs, mud zones, cabin (destination)
+      3. Collectibles: oignons (floating), future power-ups
+      4. Effects: dust, water splashes, impact particles
+      
+      You work in:
+      - src/game/scenes/Game.js (main rendering)
+      - src/game/scenes/MainMenu.js (menu graphics)
+      
+      Coordinate with:
+      - Game Mechanics Agent: collision feedback
+      - Audio Agent: particle ↔ sound sync
+      - Level Design Agent: sprite placement
+    files_to_read:
+      - "src/game/scenes/Game.js"
+      - "src/game/scenes/MainMenu.js"
+    tools_access: ["view", "edit", "grep"]
+    lint_command: "npm run lint"
+    dev_command: "npm run dev"
+    success_criteria:
+      - "All sprites render without external assets"
+      - "Maintains 60+ fps with particle effects"
+      - "Consistent visual style across all elements"
+      - "Tweens are smooth (60fps target)"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 🔊 AUDIO MANAGER AGENT
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  audio:
+    name: "Audio Manager"
+    description: "Implement music, SFX, and audio feedback via centralized AudioManager"
+    context: |
+      You manage all audio in the game via a centralized AudioManager singleton.
+      
+      Key constraints:
+      - All audio must go through AudioManager.js (single point of control)
+      - Emit events via EventBus for audio triggers (no direct calls)
+      - SFX duration: max 2s (except music loops)
+      - Volume range: 0.0 - 1.0 (normalized)
+      - No external audio files - generate or synthesize sounds
+      
+      Audio categories:
+      1. Music: background loop (ambient swamp sounds)
+      2. SFX: jump, collect, collision, powerup, UI clicks
+      3. Ambient: boss approach alert, time pressure beeps
+      4. UI: menu navigation, game over, victory stings
+      
+      You work in:
+      - src/game/AudioManager.js (main control)
+      - src/game/EventBus.js (event emitters)
+      
+      Coordinate with:
+      - Game Mechanics Agent: event emissions (jump, collect, death)
+      - UI Agent: HUD sound events
+      - Visual Agent: particle sync (dust ↔ sound)
+    files_to_read:
+      - "src/game/AudioManager.js"
+      - "src/game/EventBus.js"
+      - "src/game/scenes/Game.js"
+    tools_access: ["view", "edit", "grep"]
+    lint_command: "npm run lint"
+    dev_command: "npm run dev"
+    success_criteria:
+      - "All audio plays correctly without stutter"
+      - "Volume controls work (mute/unmute)"
+      - "No audio leaks or overlapping sounds"
+      - "SFX < 2s duration"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 🎯 LEVEL DESIGN AGENT
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  level-design:
+    name: "Level Design"
+    description: "Create and parameterize level content (obstacles, collectibles, difficulty curve)"
+    context: |
+      You design the level progression, obstacle placement, and collectible distribution.
+      
+      Key constraints:
+      - Level width: 6400px (fixed, player travels left-to-right)
+      - Must collect 7+ oignons out of 21 total to win
+      - Difficulty must scale: time → speed increase → boss gets faster
+      - No hardcoding positions: use parameterized config objects
+      - Obstacle types: mud zones (slow), villagers (instant kill), platforms
+      
+      Level zones (divide 6400px into sections):
+      - Early (0-1600px): Tutorial zone, easy obstacles
+      - Mid (1600-4000px): Mixed difficulty, main collectible area
+      - Late (4000-6400px): Hard zone, dense obstacles, boss intensifies
+      
+      Collectible distribution:
+      - Oignons: 21 total, distribute so 7 are "easy path", 14 in harder areas
+      - Power-ups: future extensibility (10% spawn chance)
+      
+      You work in:
+      - src/game/scenes/Game.js (spawn/placement logic)
+      - Create src/game/config/levels.js for parameterization
+      
+      Coordinate with:
+      - Game Mechanics Agent: spawn timing, difficulty
+      - Visual Agent: environment setup
+    files_to_read:
+      - "src/game/scenes/Game.js"
+    tools_access: ["view", "edit", "grep", "create"]
+    lint_command: "npm run lint"
+    dev_command: "npm run dev"
+    success_criteria:
+      - "7 oignons achievable without power-ups"
+      - "Difficulty scales smoothly (no sudden spikes)"
+      - "All obstacles are spawned from config"
+      - "Level is completable in 3-5 minutes"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 🖥️ UI/UX REACT AGENT
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ui-ux:
+    name: "UI/UX (React)"
+    description: "Develop React UI, menus, HUD, and React-Phaser communication"
+    context: |
+      You manage all UI and React-side logic, coordinating with Phaser via EventBus.
+      
+      Key constraints:
+      - React manages UI/UX only, Phaser manages game logic
+      - ALL game-to-UI communication via EventBus (event emission)
+      - HUD should be non-intrusive (corners, minimal screen coverage)
+      - Responsive design (mobile + desktop)
+      - No prop drilling: use EventBus for state updates
+      
+      UI Components:
+      1. MainMenu: Start, Options, Leaderboard
+      2. HUD: Score, oignons collected, timer, boss distance
+      3. PauseMenu: Resume, Settings, Quit
+      4. GameOver: Retry, Menu, Score details
+      5. Options: Volume, difficulty, accessibility
+      
+      You work in:
+      - src/App.jsx (root component)
+      - src/PhaserGame.jsx (Phaser wrapper)
+      - src/game/scenes/MainMenu.js (menu state)
+      
+      Coordinate with:
+      - Game Mechanics Agent: state updates (score, items)
+      - Audio Agent: volume controls, music toggle
+    files_to_read:
+      - "src/App.jsx"
+      - "src/PhaserGame.jsx"
+      - "src/game/EventBus.js"
+    tools_access: ["view", "edit", "grep", "create"]
+    lint_command: "npm run lint"
+    dev_command: "npm run dev"
+    success_criteria:
+      - "EventBus is the only communication layer"
+      - "HUD updates sync with game state"
+      - "No prop drilling detected"
+      - "Mobile responsive (tested at 375px width)"
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # 🚀 PERFORMANCE / QA AGENT
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  performance-qa:
+    name: "Performance & QA"
+    description: "Profile, optimize, test, and ensure code quality"
+    context: |
+      You are responsible for quality assurance, optimization, and testing.
+      
+      Key constraints:
+      - Target 60fps minimum on desktop, 55fps on mobile
+      - No memory leaks (Chrome DevTools Memory profiler)
+      - ESLint must pass with 0 warnings
+      - Puppeteer tests must pass
+      - Before/after performance benchmarks required
+      
+      Tasks:
+      1. Profile: measure fps, memory, render time
+      2. Optimize: culling, pooling, batching
+      3. Test: cross-browser, touch input, edge cases
+      4. Lint: ESLint validation
+      5. Benchmark: document perf metrics
+      
+      Tools:
+      - Chrome DevTools (Performance tab)
+      - Phaser debug overlay (fps, object count)
+      - Performance API (custom measurements)
+      - Puppeteer for automated testing
+      
+      You work in:
+      - All files (auditing + optimization)
+      - Create src/game/profiling/ for debug utilities
+      
+      Coordinate with: All agents (ensure their code is performant)
+    files_to_read:
+      - "src/game/scenes/Game.js"
+      - "src/game/AudioManager.js"
+      - "package.json"
+    tools_access: ["view", "edit", "grep", "powershell", "create"]
+    lint_command: "npm run lint"
+    build_command: "npm run build"
+    test_command: "npm run dev"
+    success_criteria:
+      - "60+ fps maintained in gameplay"
+      - "ESLint: 0 warnings"
+      - "No memory leaks over 5-minute session"
+      - "Mobile (touch) input is responsive"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# BUILD & VALIDATION
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+validation:
+  lint:
+    command: "npm run lint"
+    description: "Validate code quality"
+  
+  dev-check:
+    command: "npm run dev-nolog"
+    description: "Quick dev server check (no logging)"
+    timeout_seconds: 10
+  
+  build:
+    command: "npm run build-nolog"
+    description: "Production build validation"
+    timeout_seconds: 60
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# AGENT COLLABORATION MATRIX
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+collaboration:
+  game-mechanics:
+    reads_from: ["level-design", "visual-effects"]
+    writes_to: ["audio", "ui-ux"]
+    
+  level-design:
+    reads_from: ["game-mechanics"]
+    writes_to: ["game-mechanics", "visual-effects", "audio"]
+    
+  visual-effects:
+    reads_from: ["game-mechanics", "level-design"]
+    writes_to: ["audio"]
+    
+  audio:
+    reads_from: ["game-mechanics", "visual-effects"]
+    writes_to: []
+    
+  ui-ux:
+    reads_from: ["game-mechanics", "audio"]
+    writes_to: []
+    
+  performance-qa:
+    reads_from: ["*"]
+    writes_to: ["game-mechanics", "visual-effects", "audio"]
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# USAGE
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+help: |
+  ## How to assign tasks to agents:
+
+  Using the /agent command:
+    /agent game-mechanics
+    Add a double-jump power-up that lasts 3 seconds...
+    
+    /agent visual-effects
+    Create a glowing effect for power-ups...
+    
+    /agent audio
+    Add a "collect" sound effect for oignons...
+
+  ## Expected workflow:
+
+  1. Plan feature with multiple agents
+  2. Assign to Level Design Agent (content placement)
+  3. Assign to Game Mechanics Agent (logic)
+  4. Assign to Visual Agent (sprite effects)
+  5. Assign to Audio Agent (feedback)
+  6. Assign to UI Agent (HUD updates)
+  7. Assign to Performance/QA Agent (test & optimize)
+
+  ## Documentation:
+
+  See AGENTS.md for detailed agent profiles and examples.

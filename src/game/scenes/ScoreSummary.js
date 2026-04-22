@@ -12,6 +12,8 @@ export class ScoreSummary extends Scene
         this.totalOnions  = data.totalOnions  ?? 20;
         this.lives        = data.lives        ?? 0;
         this.timeMs       = data.timeMs       ?? 0;
+        this.level        = data.level        ?? 1;
+        this.level1Score  = data.level1Score  ?? 0;
     }
 
     create ()
@@ -96,7 +98,18 @@ export class ScoreSummary extends Scene
         // ── Input ──
         this.time.delayedCall(500, () => {
             this.input.keyboard.once('keydown-SPACE', () => this.scene.start('MainMenu'));
-            this.input.keyboard.once('keydown-ENTER', () => this.scene.start('Game'));
+            this.input.keyboard.once('keydown-ENTER', () => {
+                // If Level 1 won, go to Level 2; if Level 2 won, go to MainMenu
+                if (this.level === 1 && this.won) {
+                    // Pass score from Level 1 to Level 2
+                    const level1Score = this.onionCount;
+                    this.scene.start('Level2', { level1Score });
+                } else {
+                    // Replay current level or go back to menu
+                    const sceneName = this.level === 1 ? 'Game' : 'Level2';
+                    this.scene.start(sceneName, { level1Score: this.level1Score });
+                }
+            });
         });
 
         EventBus.emit('current-scene-ready', this);

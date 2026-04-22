@@ -1,5 +1,6 @@
 import { Boot } from './scenes/Boot';
 import { Game } from './scenes/Game';
+import { Level2 } from './scenes/Level2';
 import { GameOver } from './scenes/GameOver';
 import { Intro } from './scenes/Intro';
 import { MainMenu } from './scenes/MainMenu';
@@ -26,6 +27,7 @@ const config = {
         Intro,
         MainMenu,
         Game,
+        Level2,
         GameOver,
         ScoreSummary
     ]
