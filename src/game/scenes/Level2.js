@@ -3,6 +3,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { Math as PhaserMath } from 'phaser';
 import { LEVEL_2_CONFIG, getLevel2ObstaclesForDifficulty, getLevel2BossConfigForDifficulty, getLevel2PlayerConfigForDifficulty } from '../config/levels';
+import { CastleVFX } from '../effects/CastleVFX';
 
 // World dimensions (Level 2 is castle-themed, slightly shorter)
 const WORLD_W = 6000;
@@ -64,6 +65,10 @@ export class Level2 extends Scene
         this._startTime        = 0;
         this._enemyVY          = 0;
         
+        // Initialize VFX system
+        this.vfx = new CastleVFX(this);
+        this._bossRageActive = false;
+        
         // Get difficulty-based config
         const playerConfig = getLevel2PlayerConfigForDifficulty(this.selectedDifficulty);
         const bossConfig = getLevel2BossConfigForDifficulty(this.selectedDifficulty);
@@ -92,6 +97,7 @@ export class Level2 extends Scene
         this._createPlayer();
         this._createEnemy();
         this._createHUD();
+        this._createTorchEffects();
         this._updateNight();
         this._setupInput();
 
@@ -106,6 +112,10 @@ export class Level2 extends Scene
         this.physics.add.overlap(this.player, this.spikeZones, this._onSpikeHit, null, this);
 
         this._startTime = this.time.now;
+        
+        // Show difficulty hint
+        this.vfx.difficultyColorHint(this.selectedDifficulty, 512, 100);
+        
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -475,6 +485,11 @@ export class Level2 extends Scene
                 repeat: -1,
                 ease: 'Sine.easeInOut'
             });
+            
+            // Add shimmer effect to onions
+            if (this.vfx) {
+                this.vfx.addOnionShimmer(o);
+            }
         });
     }
 
@@ -671,10 +686,29 @@ export class Level2 extends Scene
         });
     }
 
+    // ─── Torch effects (castle atmosphere) ──────────────────────────────────
+
+    _createTorchEffects ()
+    {
+        // Torch particles at castle entrance/exit
+        const torchPositions = [
+            { x: 100, y: GROUND_SURFACE - 60 },     // Start area
+            { x: LEVEL_2_CONFIG.destination.x, y: GROUND_SURFACE - 100 }  // Exit area
+        ];
+
+        this.torchEmitters = [];
+        torchPositions.forEach(pos => {
+            const emitter = this.vfx.torchParticles(pos.x, pos.y);
+            this.torchEmitters.push(emitter);
+            emitter.emitParticleAt(pos.x, pos.y, 3);
+        });
+    }
+
     // ─── HUD ──────────────────────────────────────────────────────────────────
 
     _createHUD ()
     {
+        // Left panel - Level info and oignons
         this.hudBg = this.add.rectangle(125, 28, 240, 44, 0x000000, 0.55)
             .setScrollFactor(0).setDepth(10);
 
@@ -686,10 +720,24 @@ export class Level2 extends Scene
             strokeThickness: 4,
         }).setScrollFactor(0).setDepth(11);
 
-        this.dangerBg = this.add.rectangle(750, 28, 260, 44, 0x000000, 0.55)
+        // Center panel - Score display
+        this.scoreBg = this.add.rectangle(512, 28, 280, 44, 0x000000, 0.55)
             .setScrollFactor(0).setDepth(10);
 
-        this.dangerLabel = this.add.text(628, 10, '🐴 FARQUAAD', {
+        this.scoreText = this.add.text(512, 18, '', {
+            fontFamily: 'Uncial Antiqua',
+            fontSize: 14,
+            color: '#ffff00',
+            stroke: '#000000',
+            strokeThickness: 3,
+            align: 'center'
+        }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(11);
+
+        // Right panel - Danger bar
+        this.dangerBg = this.add.rectangle(900, 28, 160, 44, 0x000000, 0.55)
+            .setScrollFactor(0).setDepth(10);
+
+        this.dangerLabel = this.add.text(808, 10, '🐴 FARQUAAD', {
             fontFamily: 'Uncial Antiqua',
             fontSize: 14,
             color: '#ff8800',
@@ -697,13 +745,14 @@ export class Level2 extends Scene
             strokeThickness: 3,
         }).setScrollFactor(0).setDepth(11);
 
-        this.add.rectangle(750, 34, 128, 12, 0x333333, 0.9)
+        this.add.rectangle(900, 34, 128, 12, 0x333333, 0.9)
             .setScrollFactor(0).setDepth(11);
 
-        this.dangerBar = this.add.rectangle(686, 34, 1, 10, 0x22bb22)
+        this.dangerBar = this.add.rectangle(836, 34, 1, 10, 0x22bb22)
             .setOrigin(0, 0.5)
             .setScrollFactor(0).setDepth(12);
 
+        // Hearts
         this.heartTexts = [];
         for (let i = 0; i < 3; i++) {
             const h = this.add.text(14 + i * 32, 36, '❤', {
@@ -714,14 +763,28 @@ export class Level2 extends Scene
             this.heartTexts.push(h);
         }
 
-        // Level indicator
-        this.add.text(14, 56, 'NIVEAU 2', {
+        // Level 2 indicator
+        this.add.text(14, 56, 'NIVEAU 2/2', {
             fontFamily: 'Uncial Antiqua',
             fontSize: 12,
             color: '#d4a840',
             stroke: '#000000',
             strokeThickness: 3,
         }).setScrollFactor(0).setDepth(11);
+
+        // Difficulty badge
+        const difficulty = localStorage.getItem('selectedDifficulty') || 'normal';
+        const diffColor = { easy: '#22cc22', normal: '#ffdd00', hard: '#ff4444' }[difficulty];
+        const diffLabel = { easy: 'FACILE', normal: 'NORMAL', hard: 'DIFFICILE' }[difficulty];
+        
+        this.add.text(512, 56, `🎯 ${diffLabel}`, {
+            fontFamily: 'Fondamento',
+            fontSize: 12,
+            color: diffColor,
+            stroke: '#000000',
+            strokeThickness: 2,
+            align: 'center'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(11);
 
         this._updateHUD();
     }
@@ -731,10 +794,28 @@ export class Level2 extends Scene
         const reached = this.onionCount >= MIN_ONIONS;
         this.hudText.setText(`Oignons: ${this.onionCount} / ${this.totalOnions}`);
         this.hudText.setColor(reached ? '#6ecf3a' : '#f5d020');
+
+        // Update score display
+        const level1Score = this.level1Score || 0;
+        const totalScore = level1Score + this.onionCount;
+        this.scoreText.setText(`Marais: ${level1Score} + Château: ${this.onionCount} = ${totalScore}`);
+
         if (this.heartTexts) {
             this.heartTexts.forEach((h, i) => {
                 h.setAlpha(i < this.lives ? 1 : 0.2);
             });
+        }
+
+        // Auto-save checkpoint every 5 onions
+        if (this.onionCount % 5 === 0) {
+            localStorage.setItem('level2Progress', JSON.stringify({
+                level: 2,
+                onionCount: this.onionCount,
+                lives: this.lives,
+                difficulty: localStorage.getItem('selectedDifficulty')
+            }));
+            localStorage.setItem('level2Score', this.onionCount.toString());
+            localStorage.setItem('totalScore', totalScore.toString());
         }
     }
 
@@ -826,10 +907,24 @@ export class Level2 extends Scene
 
         this.playerSprite.setRotation(PhaserMath.Clamp(vx / 8000, -0.15, 0.15));
 
-        // Enemy speed acceleration
+        // Enemy speed acceleration + VFX
         if (this._enemyMoving && !this._isGameOver) {
             this._gameElapsed += delta;
-            this._speedMultiplier = Math.min(this._bossMaxSpeed / this._bossBaseSpeed, 1 + Math.floor(this._gameElapsed / 20000) * this._bossDifficultyScaling);
+            const newMultiplier = Math.min(this._bossMaxSpeed / this._bossBaseSpeed, 1 + Math.floor(this._gameElapsed / 20000) * this._bossDifficultyScaling);
+            
+            // Trigger rage glow if speed multiplier increased
+            if (newMultiplier > this._speedMultiplier && !this._bossRageActive) {
+                this._bossRageActive = true;
+                this.vfx.bossAccelerationFlicker();
+                
+                // Only start new rage glow if not already active
+                if (!this.enemy.hasRageGlow) {
+                    this.enemy.hasRageGlow = true;
+                    this.vfx.bossRageGlow(this.enemy);
+                }
+            }
+            
+            this._speedMultiplier = newMultiplier;
         }
 
         // Enemy movement
@@ -858,6 +953,14 @@ export class Level2 extends Scene
             if (this._enemyMoving) {
                 const dx = Math.abs(this.player.x - this.enemy.x);
                 const dy = Math.abs(this.player.y - this.enemy.y);
+                
+                // Boss proximity camera zoom
+                if (dx < 200) {
+                    this.vfx.cameraZoomOnBoss(1.15, 300);
+                } else {
+                    this.vfx.cameraResetZoom(300);
+                }
+                
                 if (dx < 32 && dy < 58) {
                     this._onEnemyCatch();
                 }
@@ -880,6 +983,10 @@ export class Level2 extends Scene
         if (this._isGameOver) return;
         this._isGameOver  = true;
         this._enemyMoving = false;
+
+        // VFX: Death flash and screen shake
+        this.vfx.deathFlash();
+        this.vfx.screenShake(4, 200);
 
         this.lives--;
         this._updateNight();
@@ -906,16 +1013,25 @@ export class Level2 extends Scene
 
     _onGuardHit (player, guard)
     {
+        // VFX: Guard hit particles and screen shake
+        this.vfx.guardHitParticles(guard.x, guard.y);
+        this.vfx.screenShake(3, 150);
         this._onEnemyCatch();
     }
 
     _onSpikeHit (player, spike)
     {
+        // VFX: Spike particles and screen shake
+        this.vfx.spikesParticles(player.x, player.y);
+        this.vfx.screenShake(3, 180);
         this._onEnemyCatch();
     }
 
     _collectOnion (player, onion)
     {
+        // VFX: Collection shimmer and particles
+        this.vfx.onionCollectParticles(onion.x, onion.y);
+        
         onion.destroy();
         this.onionCount++;
         this._updateHUD();
@@ -964,6 +1080,11 @@ export class Level2 extends Scene
 
         this.player.setAccelerationX(0);
         this.player.setVelocityX(0);
+
+        // VFX: Victory explosion at player location
+        this.vfx.victoryExplosion(this.player.x, this.player.y);
+        this.vfx.screenShake(2, 300);
+        this.vfx.cameraZoomOnBoss(1.3, 400);
 
         // Emit victory event for cinematique
         EventBus.emit('level-complete', { level: 2, onionCount: this.onionCount });
