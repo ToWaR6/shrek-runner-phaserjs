@@ -1,24 +1,33 @@
 import { Boot } from './scenes/Boot';
 import { Game } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
+import { Intro } from './scenes/Intro';
 import { MainMenu } from './scenes/MainMenu';
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { Preloader } from './scenes/Preloader';
+import { ScoreSummary } from './scenes/ScoreSummary';
 
-// Find out more information about the Game Config at:
-// https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: Phaser.AUTO,
     width: 1024,
     height: 768,
     parent: 'game-container',
-    backgroundColor: '#028af8',
+    backgroundColor: '#3a7d2c',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 900 },
+            debug: false
+        }
+    },
     scene: [
         Boot,
         Preloader,
+        Intro,
         MainMenu,
         Game,
-        GameOver
+        GameOver,
+        ScoreSummary
     ]
 };
 
