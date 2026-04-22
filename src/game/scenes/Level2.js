@@ -1,4 +1,5 @@
 import { AudioManager } from '../AudioManager';
+import { CastleAudio } from '../audio/CastleAudio';
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { Math as PhaserMath } from 'phaser';
@@ -68,6 +69,10 @@ export class Level2 extends Scene
         // Initialize VFX system
         this.vfx = new CastleVFX(this);
         this._bossRageActive = false;
+
+        // Initialize Castle Audio system
+        CastleAudio.init();
+        CastleAudio.startMusic();
         
         // Get difficulty-based config
         const playerConfig = getLevel2PlayerConfigForDifficulty(this.selectedDifficulty);
@@ -922,9 +927,19 @@ export class Level2 extends Scene
                     this.enemy.hasRageGlow = true;
                     this.vfx.bossRageGlow(this.enemy);
                 }
+                
+                // Update boss phase music
+                CastleAudio.setBossPhaseMusic(newMultiplier);
+                EventBus.emit('boss-speed-change', newMultiplier);
             }
             
             this._speedMultiplier = newMultiplier;
+        }
+
+        // Tension phase: increase tempo near level end (x > 4500)
+        if (!this._isGameOver && this.player.x > 4500) {
+            const tensionIntensity = Math.min(1.0, (this.player.x - 4500) / 1500);
+            CastleAudio.setTensionPhase(tensionIntensity);
         }
 
         // Enemy movement
@@ -987,6 +1002,7 @@ export class Level2 extends Scene
         // VFX: Death flash and screen shake
         this.vfx.deathFlash();
         this.vfx.screenShake(4, 200);
+        EventBus.emit('player-death');
 
         this.lives--;
         this._updateNight();
@@ -1016,6 +1032,7 @@ export class Level2 extends Scene
         // VFX: Guard hit particles and screen shake
         this.vfx.guardHitParticles(guard.x, guard.y);
         this.vfx.screenShake(3, 150);
+        EventBus.emit('guard-hit');
         this._onEnemyCatch();
     }
 
@@ -1024,6 +1041,7 @@ export class Level2 extends Scene
         // VFX: Spike particles and screen shake
         this.vfx.spikesParticles(player.x, player.y);
         this.vfx.screenShake(3, 180);
+        EventBus.emit('spike-hit');
         this._onEnemyCatch();
     }
 
@@ -1036,6 +1054,7 @@ export class Level2 extends Scene
         this.onionCount++;
         this._updateHUD();
         AudioManager.onion();
+        EventBus.emit('oignon-collected');
 
         this.tweens.add({
             targets: this.hudBg,
@@ -1100,5 +1119,9 @@ export class Level2 extends Scene
                 level1Score: this.level1Score,
             });
         });
+    }
+
+    shutdown() {
+        CastleAudio.stopMusic();
     }
 }
