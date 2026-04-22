@@ -904,6 +904,16 @@ export class Game extends Scene
                 h.setAlpha(i < this.lives ? 1 : 0.2);
             });
         }
+
+        // Auto-save checkpoint every 5 onions
+        if (this.onionCount % 5 === 0) {
+            localStorage.setItem('level1Progress', JSON.stringify({
+                level: 1,
+                onionCount: this.onionCount,
+                lives: this.lives
+            }));
+            localStorage.setItem('level1Score', this.onionCount.toString());
+        }
     }
 
     // ─── Input ────────────────────────────────────────────────────────────────

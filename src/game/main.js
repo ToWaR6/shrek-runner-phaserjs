@@ -4,6 +4,8 @@ import { Level2 } from './scenes/Level2';
 import { GameOver } from './scenes/GameOver';
 import { Intro } from './scenes/Intro';
 import { MainMenu } from './scenes/MainMenu';
+import { LevelSelect } from './scenes/LevelSelect';
+import { DifficultySelect } from './scenes/DifficultySelect';
 import * as Phaser from 'phaser';
 import { Preloader } from './scenes/Preloader';
 import { ScoreSummary } from './scenes/ScoreSummary';
@@ -26,6 +28,8 @@ const config = {
         Preloader,
         Intro,
         MainMenu,
+        LevelSelect,
+        DifficultySelect,
         Game,
         Level2,
         GameOver,

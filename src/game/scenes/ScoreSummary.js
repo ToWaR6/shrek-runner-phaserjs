@@ -21,26 +21,50 @@ export class ScoreSummary extends Scene
         const cx = this.scale.width  / 2;  // 512
         const cy = this.scale.height / 2;  // 384
 
-        // Background
-        const bgColor = this.won ? 0x1a4a10 : 0x3a1010;
+        // Different backgrounds for Level 1 vs Level 2
+        const bgColor = this.won ? (this.level === 2 ? 0x3a4a2a : 0x1a4a10) : 0x3a1010;
         this.add.rectangle(cx, cy, this.scale.width, this.scale.height, bgColor);
 
-        // Decorative swamp trees (same as MainMenu)
-        for (let x = 60; x < this.scale.width; x += 160) {
-            const h = 80 + Math.floor((x * 37) % 120);
-            this.add.rectangle(x, cy + 180 - h / 2, 50, h, 0x0d2a08).setAlpha(0.5);
+        // Decorative elements (swamp for Level 1, castle for Level 2)
+        if (this.level === 2) {
+            // Castle towers
+            for (let x = 60; x < this.scale.width; x += 160) {
+                const h = 80 + Math.floor((x * 37) % 120);
+                this.add.rectangle(x, cy + 180 - h / 2, 50, h, 0x1a2a18).setAlpha(0.5);
+            }
+        } else {
+            // Swamp trees
+            for (let x = 60; x < this.scale.width; x += 160) {
+                const h = 80 + Math.floor((x * 37) % 120);
+                this.add.rectangle(x, cy + 180 - h / 2, 50, h, 0x0d2a08).setAlpha(0.5);
+            }
         }
 
         // ── Title ──
-        const titleText = this.won ? '🏆 VICTOIRE !' : '💀 GAME OVER';
-        const titleColor = this.won ? '#6ecf3a' : '#ff4444';
-        this.add.text(cx, 90, titleText, {
+        let titleText, titleColor;
+        if (this.level === 2) {
+            titleText = this.won ? '🏰 CHÂTEAU CONQUIS !' : '💀 GAME OVER';
+            titleColor = this.won ? '#d4a840' : '#ff4444';
+        } else {
+            titleText = this.won ? '🏆 VICTOIRE !' : '💀 GAME OVER';
+            titleColor = this.won ? '#6ecf3a' : '#ff4444';
+        }
+
+        this.add.text(cx, 60, titleText, {
             fontFamily: 'Uncial Antiqua',
-            fontSize: 64,
+            fontSize: this.level === 2 ? 56 : 64,
             color: titleColor,
             stroke: '#000000',
             strokeThickness: 10,
             align: 'center',
+        }).setOrigin(0.5);
+
+        // Level indicator
+        const levelLabel = this.level === 2 ? 'NIVEAU 2 - LE CHÂTEAU' : 'NIVEAU 1 - LE MARAIS';
+        this.add.text(cx, 100, levelLabel, {
+            fontFamily: 'Fondamento',
+            fontSize: 14,
+            color: this.level === 2 ? '#d4a840' : '#6ecf3a',
         }).setOrigin(0.5);
 
         // ── Stats panel ──
@@ -74,11 +98,31 @@ export class ScoreSummary extends Scene
         this.add.text(cx - 200, 390, '⭐ Note', { fontFamily: 'Uncial Antiqua', fontSize: 20, color: '#cccccc' }).setOrigin(0, 0.5);
         this.add.text(cx + 200, 390, grade, { fontFamily: 'Uncial Antiqua', fontSize: 52, color: gradeColor, stroke: '#000000', strokeThickness: 6 }).setOrigin(1, 0.5);
 
+        // ── Score Summary (for Level 2) ──
+        if (this.level === 2 && this.won) {
+            this.add.rectangle(cx, 470, 560, 100, 0x000000, 0.65).setOrigin(0.5);
+
+            this.add.text(cx - 200, 440, '📊 SCORES CUMULATIFS', { fontFamily: 'Uncial Antiqua', fontSize: 16, color: '#d4a840' }).setOrigin(0, 0.5);
+
+            const level1Display = this.level1Score || 0;
+            const level2Display = this.onionCount;
+            const totalDisplay = level1Display + level2Display;
+
+            this.add.text(cx - 200, 460, `Niveau 1 (Marais): ${level1Display}`, { fontFamily: 'Fondamento', fontSize: 14, color: '#6ecf3a' }).setOrigin(0, 0.5);
+            this.add.text(cx - 200, 480, `+ Niveau 2 (Château): ${level2Display}`, { fontFamily: 'Fondamento', fontSize: 14, color: '#d4a840' }).setOrigin(0, 0.5);
+            this.add.text(cx - 200, 502, `= Total: ${totalDisplay}`, { fontFamily: 'Uncial Antiqua', fontSize: 18, color: '#ffff00', stroke: '#000000', strokeThickness: 3 }).setOrigin(0, 0.5);
+
+            // Persist scores
+            localStorage.setItem('level2Score', level2Display.toString());
+            localStorage.setItem('totalScore', totalDisplay.toString());
+            localStorage.setItem('level1Complete', 'true');
+        }
+
         // ── Separator ──
-        this.add.rectangle(cx, 440, 520, 2, 0xffffff, 0.15);
+        this.add.rectangle(cx, 540, 520, 2, 0xffffff, 0.15);
 
         // ── Prompt ──
-        const prompt = this.add.text(cx, 500, 'ESPACE — Retour au menu', {
+        const prompt = this.add.text(cx, 580, 'ESPACE — ' + (this.level === 2 ? 'Fin de jeu' : 'Retour au menu'), {
             fontFamily: 'Uncial Antiqua',
             fontSize: 22,
             color: '#f5d020',
@@ -89,23 +133,55 @@ export class ScoreSummary extends Scene
         this.tweens.add({ targets: prompt, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
 
         // ── Sub-prompt ──
-        this.add.text(cx, 545, 'ENTRÉE — Rejouer', {
+        const subPromptText = this.level === 2 
+            ? (this.won ? 'ENTRÉE — Rejouer le Château' : 'ENTRÉE — Retour au menu')
+            : 'ENTRÉE — Rejouer';
+
+        this.add.text(cx, 615, subPromptText, {
             fontFamily: 'Fondamento',
             fontSize: 16,
             color: '#aaffaa',
         }).setOrigin(0.5).setAlpha(0.8);
 
+        // Difficulty display for Level 2
+        if (this.level === 2) {
+            const difficulty = localStorage.getItem('selectedDifficulty') || 'normal';
+            const diffColor = { easy: '#22cc22', normal: '#ffdd00', hard: '#ff4444' }[difficulty];
+            const diffLabel = { easy: 'FACILE', normal: 'NORMAL', hard: 'DIFFICILE' }[difficulty];
+            
+            this.add.text(cx, 640, `Difficulté: ${diffLabel}`, {
+                fontFamily: 'Fondamento',
+                fontSize: 12,
+                color: diffColor,
+                stroke: '#000000',
+                strokeThickness: 2,
+            }).setOrigin(0.5);
+        }
+
         // ── Input ──
         this.time.delayedCall(500, () => {
-            this.input.keyboard.once('keydown-SPACE', () => this.scene.start('MainMenu'));
-            this.input.keyboard.once('keydown-ENTER', () => {
-                // If Level 1 won, go to Level 2; if Level 2 won, go to MainMenu
-                if (this.level === 1 && this.won) {
-                    // Pass score from Level 1 to Level 2
-                    const level1Score = this.onionCount;
-                    this.scene.start('Level2', { level1Score });
+            this.input.keyboard.once('keydown-SPACE', () => {
+                if (this.level === 2 && this.won) {
+                    // Level 2 complete — return to main menu
+                    this.scene.start('MainMenu');
                 } else {
-                    // Replay current level or go back to menu
+                    // Level 1 or game over — return to main menu
+                    this.scene.start('MainMenu');
+                }
+            });
+
+            this.input.keyboard.once('keydown-ENTER', () => {
+                if (this.level === 1 && this.won) {
+                    // Go to Level 2 difficulty selector
+                    const level1Score = this.onionCount;
+                    localStorage.setItem('level1Score', level1Score.toString());
+                    localStorage.setItem('level1Complete', 'true');
+                    this.scene.start('DifficultySelect', { level: 2 });
+                } else if (this.level === 2 && this.won) {
+                    // Replay Level 2
+                    this.scene.start('Level2', { level1Score: this.level1Score });
+                } else {
+                    // Game over — replay current level
                     const sceneName = this.level === 1 ? 'Game' : 'Level2';
                     this.scene.start(sceneName, { level1Score: this.level1Score });
                 }
