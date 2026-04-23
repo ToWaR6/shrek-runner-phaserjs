@@ -178,11 +178,11 @@ export class ScoreSummary extends Scene
 
             this.input.keyboard.once('keydown-ENTER', () => {
                 if (this.level === 1 && this.won) {
-                    // Go to Level 2 difficulty selector
+                    // Go to Level 2 transition screen
                     const level1Score = this.onionCount;
                     localStorage.setItem('level1Score', level1Score.toString());
                     localStorage.setItem('level1Complete', 'true');
-                    this.scene.start('DifficultySelect', { level: 2 });
+                    this.scene.start('LevelTransition', { level1Score });
                 } else if (this.level === 2 && this.won) {
                     // Replay Level 2
                     this.scene.start('Level2', { level1Score: this.level1Score });
