@@ -139,80 +139,92 @@ export class Game extends Scene
 
         // Reusable: draw head + body (everything above y=44)
         const drawUpper = (g) => {
-            // ── Head (y 0..27) ──
-            // Base fill so transparent areas stay clean
-            g.fillStyle(SK);  g.fillRect(0, 0, W, 27);
-            // Big round head
-            g.fillStyle(SK);  g.fillEllipse(22, 14, 40, 27);
-            // Iconic ears sticking out from the sides
-            g.fillStyle(SKS); g.fillEllipse(2,  11, 10, 14);
-            g.fillStyle(SKS); g.fillEllipse(42, 11, 10, 14);
-            // Heavy brow ridges (Shrek's scowl)
-            g.fillStyle(SKS); g.fillRect(10, 6, 10, 5);
-            g.fillStyle(SKS); g.fillRect(24, 6, 10, 5);
-            // Eyes (white + pupil)
-            g.fillStyle(EW);  g.fillEllipse(15, 12, 9, 7);
-            g.fillStyle(EW);  g.fillEllipse(29, 12, 9, 7);
-            g.fillStyle(PU);  g.fillRect(13,  9, 4, 5);
-            g.fillStyle(PU);  g.fillRect(27,  9, 4, 5);
-            // Broad nose with nostrils
-            g.fillStyle(SKS); g.fillRect(19, 17, 6, 5);
-            g.fillStyle(VD);  g.fillRect(19, 19, 2, 2);
-            g.fillStyle(VD);  g.fillRect(23, 19, 2, 2);
-            // Mouth / smile
-            g.fillStyle(VD);  g.fillRect(16, 23, 12, 3);
-            // ── Body / vest (y 27..44) ──
-            g.fillStyle(SK);  g.fillRect(0,  27, W,  17);  // green skin base
-            g.fillStyle(VS);  g.fillRect(7,  27, 12, 17);  // left vest panel
-            g.fillStyle(VS);  g.fillRect(25, 27, 12, 17);  // right vest panel
-            g.fillStyle(VD);  g.fillRect(7,  40, 30,  5);  // belt
-            g.fillStyle(GL);  g.fillRect(19, 40,  6,  5);  // buckle
+            // ── Head (y 0..30) ──
+            // Base fill - larger head for ogre look
+            g.fillStyle(SK);  g.fillRect(0, 0, W, 30);
+            // Bigger rounder head
+            g.fillStyle(SK);  g.fillEllipse(22, 15, 42, 30);
+            // Iconic ears sticking out more (ogre ears)
+            g.fillStyle(SK);  g.fillEllipse(2,  12, 12, 16);
+            g.fillStyle(SK);  g.fillEllipse(42, 12, 12, 16);
+            g.fillStyle(SKS); g.fillEllipse(2,  12, 8, 12);
+            g.fillStyle(SKS); g.fillEllipse(42, 12, 8, 12);
+            // Shrek antenna-ears (pointy protrusions at top)
+            g.fillStyle(SK);  g.fillRect(8, -2, 4, 6);    // left antenna
+            g.fillStyle(SKS); g.fillRect(9, -2, 2, 6);    // left antenna shadow
+            g.fillStyle(SK);  g.fillRect(32, -2, 4, 6);   // right antenna
+            g.fillStyle(SKS); g.fillRect(33, -2, 2, 6);   // right antenna shadow
+            // Heavy prominent brow ridges (Shrek's scowl)
+            g.fillStyle(SKS); g.fillRect(9, 4, 12, 7);
+            g.fillStyle(SKS); g.fillRect(23, 4, 12, 7);
+            g.fillStyle(VD);  g.fillRect(9, 4, 12, 3);
+            g.fillStyle(VD);  g.fillRect(23, 4, 12, 3);
+            // Eyes (larger + more expressive)
+            g.fillStyle(EW);  g.fillEllipse(14, 13, 10, 8);
+            g.fillStyle(EW);  g.fillEllipse(30, 13, 10, 8);
+            g.fillStyle(PU);  g.fillRect(12,  10, 5, 6);
+            g.fillStyle(PU);  g.fillRect(28,  10, 5, 6);
+            g.fillStyle(0x000000); g.fillRect(13, 11, 3, 2); // highlight
+            g.fillStyle(0x000000); g.fillRect(29, 11, 3, 2); // highlight
+            // Prominent broad nose with visible nostrils (ogre nose)
+            g.fillStyle(SKS); g.fillRect(18, 18, 8, 7);
+            g.fillStyle(VD);  g.fillRect(18, 21, 3, 3);
+            g.fillStyle(VD);  g.fillRect(23, 21, 3, 3);
+            // Mouth / smile (more defined)
+            g.fillStyle(VD);  g.fillRect(15, 25, 14, 4);
+            g.fillStyle(0x000000); g.fillRect(16, 26, 12, 2);
+            // ── Body / vest (y 30..46) ──
+            g.fillStyle(SK);  g.fillRect(0,  30, W,  16);  // green skin base (wider chest)
+            g.fillStyle(VS);  g.fillRect(5,  30, 14, 16);  // left vest panel (wider)
+            g.fillStyle(VS);  g.fillRect(25, 30, 14, 16);  // right vest panel (wider)
+            g.fillStyle(VD);  g.fillRect(5,  42, 34,  5);  // belt (wider)
+            g.fillStyle(GL);  g.fillRect(18, 42,  8,  5);  // buckle (bigger)
         };
 
         // Reusable: draw a pair of legs given offsets
         // lx/rx = left/right leg x origin, ly/ry = y origin, lh/rh = height
         const drawLegs = (g, lx, ly, lh, rx, ry, rh) => {
             g.fillStyle(PT);
-            g.fillRect(lx, ly, 12, lh);          // left leg
-            g.fillRect(rx, ry, 12, rh);           // right leg
+            g.fillRect(lx, ly, 13, lh);          // left leg (wider)
+            g.fillRect(rx, ry, 13, rh);           // right leg (wider)
             g.fillStyle(VD);
-            g.fillRect(lx - 1, ly + lh, 14, 4);  // left boot
-            g.fillRect(rx - 1, ry + rh, 14, 4);  // right boot
+            g.fillRect(lx - 1, ly + lh, 15, 5);  // left boot (bigger)
+            g.fillRect(rx - 1, ry + rh, 15, 5);  // right boot (bigger)
         };
 
         // idle / walk2 (symmetric stance)
         make('shrek', W, H, g => {
             drawUpper(g);
-            drawLegs(g,  8, 44, 12,  24, 44, 12);
+            drawLegs(g,  7, 46, 12,  24, 46, 12);
         });
 
         // walk1 — left leg forward, right leg back
         make('shrek-walk1', W, H, g => {
             drawUpper(g);
-            drawLegs(g,  5, 44, 13,  27, 46, 10);
+            drawLegs(g,  5, 46, 13,  26, 48, 11);
         });
 
         // walk2 — same as idle (transition frame)
         make('shrek-walk2', W, H, g => {
             drawUpper(g);
-            drawLegs(g,  8, 44, 12,  24, 44, 12);
+            drawLegs(g,  7, 46, 12,  24, 46, 12);
         });
 
         // walk3 — right leg forward, left leg back
         make('shrek-walk3', W, H, g => {
             drawUpper(g);
-            drawLegs(g, 11, 46, 10,  21, 44, 13);
+            drawLegs(g, 11, 48, 11,  20, 46, 13);
         });
 
         // jump — legs tucked up
         make('shrek-jump', W, H, g => {
             drawUpper(g);
             g.fillStyle(PT);
-            g.fillRect(7,  46, 12, 9);   // left leg tucked
-            g.fillRect(25, 46, 12, 9);   // right leg tucked
+            g.fillRect(6,  48, 13, 10);   // left leg tucked (wider)
+            g.fillRect(25, 48, 13, 10);   // right leg tucked (wider)
             g.fillStyle(VD);
-            g.fillRect(6,  53, 14, 4);
-            g.fillRect(24, 53, 14, 4);
+            g.fillRect(5,  56, 15, 4);
+            g.fillRect(24, 56, 15, 4);
         });
 
         // ── Farquaad on horseback (50×72) ─────────────────────────────────────
@@ -1070,7 +1082,6 @@ export class Game extends Scene
         this._enemyMoving = false;
 
         this.lives--;
-        this._updateNight();
 
         if (this.lives <= 0) {
             // No lives left — go to score screen
@@ -1088,6 +1099,7 @@ export class Game extends Scene
         }
 
         // Lives remaining — restart level from beginning, keeping lives count
+        this._updateNight();
         AudioManager.hit();
         this.scene.restart({ lives: this.lives });
     }

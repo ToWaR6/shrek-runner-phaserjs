@@ -42,11 +42,35 @@ export class Intro extends Scene
             this.add.rectangle(x + 140, groundY - h / 2, 260, h, 0x3a7040).setAlpha(0.5);
         }
 
-        // Tree silhouettes
-        for (let x = 60; x < width; x += 180) {
-            const h = 80 + (x % 80);
-            this.add.rectangle(x, groundY - h / 2, 44, h, 0x245220).setAlpha(0.65);
-            this.add.rectangle(x, groundY - h - 15, 65, 32, 0x2d6628).setAlpha(0.55);
+        // Swamp trees — same style as Game scene
+        for (let x = 80; x < width; x += 180 + (x % 90)) {
+            const trunkH = 65 + (x % 65);
+            const trunkW = 16 + (x % 10);
+            const topY   = groundY - trunkH;
+            const cSize  = 48 + (x % 42);
+
+            const g = this.add.graphics().setAlpha(0.72);
+
+            // Trunk
+            g.fillStyle(0x3a2008);
+            g.fillRect(x - trunkW / 2, topY, trunkW, trunkH);
+            g.fillRect(x - trunkW / 2 - 4, topY + trunkH - 14, trunkW + 8, 14);
+
+            // Canopy
+            g.fillStyle(0x1b4710);
+            g.fillCircle(x, topY, cSize);
+            g.fillStyle(0x245a18);
+            g.fillCircle(x - cSize * 0.52, topY + cSize * 0.18, cSize * 0.68);
+            g.fillCircle(x + cSize * 0.52, topY + cSize * 0.18, cSize * 0.62);
+            g.fillStyle(0x1b4710);
+            g.fillCircle(x, topY - cSize * 0.38, cSize * 0.72);
+
+            // Hanging vines
+            g.fillStyle(0x2a5c12);
+            [-18, -4, 10, 24].forEach((ox, i) => {
+                const vLen = 14 + ((x + i * 7) % 18);
+                g.fillRect(x + ox, topY + cSize * 0.55, 3, vLen);
+            });
         }
 
         // Ground

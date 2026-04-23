@@ -63,8 +63,8 @@ export class MainMenu extends Scene
             color: '#aaffaa',
         }).setOrigin(0.5);
 
-        this.input.keyboard.once('keydown-SPACE', () => this.scene.start('Game'));
-        this.input.keyboard.once('keydown-ENTER', () => this.scene.start('Game'));
+        this.input.keyboard.once('keydown-SPACE', () => this.scene.start('Game', { lives: 3 }));
+        this.input.keyboard.once('keydown-ENTER', () => this.scene.start('Game', { lives: 3 }));
 
         // Double-ESC → replay intro (secret shortcut)
         let escCount = 0;
