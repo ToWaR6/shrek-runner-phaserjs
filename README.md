@@ -48,15 +48,30 @@ Ramassez au moins **7 oignons sur 21** pour débloquer l'arrivée.
 
 ## Lancer le jeu
 
-```bash
-npm install
-npm run dev
-# → http://localhost:8080
-```
+### Prérequis
+
+Installez [Node.js](https://nodejs.org/) et npm, puis ouvrez un terminal à la racine du projet.
+
+### Développement local
 
 ```bash
-npm run build   # Build de production dans dist/
+npm ci
+npm run dev-nolog
 ```
+
+`npm ci` installe les versions des dépendances verrouillées dans `package-lock.json`.
+Ouvrez l'URL affichée par Vite dans votre navigateur : par défaut, `http://localhost:8080`.
+Si ce port est déjà occupé, Vite peut en sélectionner un autre.
+Gardez le terminal ouvert pendant la partie et utilisez `Ctrl+C` pour arrêter le serveur.
+
+### Build de production
+
+```bash
+npm run build-nolog   # Build de production dans dist/
+```
+
+Les variantes `dev-nolog` et `build-nolog` évitent l'appel de journalisation du template.
+Les commandes `npm run dev` et `npm run build` restent disponibles avec cette journalisation.
 
 ## Structure du projet
 
