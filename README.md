@@ -25,7 +25,7 @@ Une cinématique d'introduction explique pourquoi Farquaad s'est mis en colère 
 ## Gameplay
 
 ### Objectif
-Traverser le niveau de gauche à droite (6 400 px) jusqu'à la cabane de Shrek, sans être rattrapé par Farquaad.  
+Traverser le niveau de gauche à droite (6 000 px) jusqu'à la cabane de Shrek, sans être rattrapé par Farquaad.
 Ramassez au moins **7 oignons sur 21** pour débloquer l'arrivée.
 
 ### Contrôles
@@ -83,14 +83,19 @@ Les commandes `npm run dev` et `npm run build` restent disponibles avec cette jo
 
 ```
 src/
-├── game/
-│   ├── scenes/
-│   │   ├── Intro.js        # Cinématique d'introduction
-│   │   ├── MainMenu.js     # Menu principal
-│   │   ├── Game.js         # Scène de jeu principale
-│   │   ├── GameOver.js     # Écran de game over
-│   │   └── ScoreSummary.js # Écran de fin avec note
-│   ├── AudioManager.js     # Effets sonores
-│   └── EventBus.js         # Communication React ↔ Phaser
-└── App.jsx
+├── main.jsx          # Point d'entrée React
+├── App.jsx           # Composant racine
+├── PhaserGame.jsx    # Liaison React ↔ Phaser
+└── game/
+    ├── main.js       # Configuration et lancement de Phaser
+    ├── AudioManager.js
+    ├── EventBus.js   # Communication React ↔ Phaser
+    └── scenes/
+        ├── Boot.js
+        ├── Preloader.js
+        ├── Intro.js        # Cinématique d'introduction
+        ├── MainMenu.js     # Menu principal
+        ├── Game.js         # Scène de jeu principale
+        ├── GameOver.js
+        └── ScoreSummary.js # Écran de fin avec score
 ```
