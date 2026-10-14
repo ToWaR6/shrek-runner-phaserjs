@@ -73,6 +73,12 @@ npm run build-nolog   # Build de production dans dist/
 Les variantes `dev-nolog` et `build-nolog` évitent l'appel de journalisation du template.
 Les commandes `npm run dev` et `npm run build` restent disponibles avec cette journalisation.
 
+### Dépannage
+
+- **`npm` n'est pas reconnu** : vérifiez que Node.js et npm sont installés, puis rouvrez le terminal.
+- **`vite` n'est pas reconnu** : exécutez `npm ci` à la racine du projet et vérifiez que l'installation se termine sans erreur avant de relancer `npm run dev-nolog`.
+- **Le navigateur refuse la connexion** : vérifiez que le serveur Vite est toujours actif et ouvrez l'URL exacte affichée dans son terminal.
+
 ## Structure du projet
 
 ```
